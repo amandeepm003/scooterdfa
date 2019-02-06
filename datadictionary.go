@@ -50,6 +50,7 @@ var (
 	EventTerminate = Event {OutputState:StateTerminated, Role:RoleAdmin}
 )
 
+//Mealy Machine where every state transition can be justified back on input event
 type DFATransition struct {
 	PrevState State
 	NewState State
