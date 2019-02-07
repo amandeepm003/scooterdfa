@@ -21,7 +21,7 @@ func rolePermitted (roles []Role, matchRole Role) bool {
 }
 
 
-func toStateString(state State) string {
+func ToStateString(state State) string {
 	var stringval string
 	switch state {
 	case StateReady: stringval = "StateReady"
@@ -38,7 +38,7 @@ func toStateString(state State) string {
 	return stringval
 }
 
-func toRoleString(role Role) string {
+func ToRoleString(role Role) string {
 	var roleval string
 	switch role {
 	case RoleUser: roleval = "RoleUser"

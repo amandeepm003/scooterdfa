@@ -59,12 +59,12 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) *DFAError {
 
 	roles, valid := dfa.triggers[dfa.state][destState]
 	if !valid {
-		return &DFAError{Type: "Invalid Transition", Detail: "Role: " + toRoleString(role)+ " CurrState: "+ toStateString(dfa.state) + " DestState: "+ toStateString(destState), Status: 400, TimeStamp: time.Now()}
+		return &DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 400, TimeStamp: time.Now()}
 	}
 
 	// Check if permissions are valid
 	if !rolePermitted(roles,role) {
-		return &DFAError{Type: "Access Denied", Detail: "Role:  " + toRoleString(role) + " CurrState: "+ toStateString(dfa.state) + " DestState: "+ toStateString(destState), Status: 403, TimeStamp:time.Now()}
+		return &DFAError{Type: "Access Denied", Detail: "Role:  " + ToRoleString(role) + " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 403, TimeStamp:time.Now()}
 	}
 
 	dfa.state = destState //Reached here after validation, so set DFA to this new state
