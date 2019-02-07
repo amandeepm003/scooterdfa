@@ -49,6 +49,11 @@ func BuildDFA(inputTransitions []DFATransition) *VoiDFA {
 
 
 func (dfa *VoiDFA) Trigger(destState State, role Role) *DFAError {
+
+	if destState==dfa.state { //State is always reachable by itself, irrespective of role, without counting transition or obtaining lock
+		return nil
+	}
+
 	dfa.mutex.Lock()
 	defer dfa.mutex.Unlock()
 

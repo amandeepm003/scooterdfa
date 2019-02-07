@@ -14,8 +14,8 @@ func main() {
 	fmt.Println("Automata %+v", dfa)
 
 
-	fmt.Println("AutomataState %+v", dfa.State())
-	err := dfa.Trigger(voidfa.StateDropped,voidfa.RoleAdmin)
+	fmt.Println("AutomataState %+v", voidfa.ToStateString(dfa.State()))
+	err := dfa.Trigger(voidfa.StateReady,voidfa.RoleUser)
 	fmt.Println("AutomataState %+v", voidfa.ToStateString(dfa.State()))
 
 	fmt.Println("Error %+v", err)
