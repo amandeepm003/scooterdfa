@@ -54,7 +54,7 @@ var (
 type DFATransition struct {
 	PrevState State
 	NewState State
-	Event Event //Injection place to document/log a transition
+	Event Event //Place to document/log a transition, furthermore (for non-admin) DFA transition must match to specific event, unlike NFA
 	Roles []Role
 }
 

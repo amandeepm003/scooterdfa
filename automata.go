@@ -31,7 +31,7 @@ func (dfa *VoiDFA) State() State {
 }
 
 
-func buildDFA(inputTransitions []DFATransition) *VoiDFA {
+func (dfa *VoiDFA) BuildDFA(inputTransitions []DFATransition) *VoiDFA {
 
 	if len(inputTransitions) < 1 {
 		//Not a DFA: Reason -> https://stackoverflow.com/questions/13791205/can-a-dfa-have-epsilon-lambda-transitions
