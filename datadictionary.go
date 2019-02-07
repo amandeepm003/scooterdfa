@@ -58,7 +58,7 @@ type DFATransition struct {
 	Roles []Role
 }
 
-var availableTransitions = []DFATransition{
+var AvailableTransitions = []DFATransition{
 	//NewState is resultant state, event "could be" most probable cause
 	{PrevState: StateReady, NewState: StateRiding, Event: EventRideStart, Roles: []Role{RoleUser, RoleHunter, RoleAdmin}},
 	{PrevState: StateRiding, NewState: StateReady, Event: EventRideStart, Roles: []Role{RoleUser, RoleHunter, RoleAdmin}},

@@ -14,10 +14,6 @@ In the Moore model, the output is a function of only the present state
  */
 
 
-
-var transitions = availableTransitions //load transitions for this DFA from available data dictionary
-
-
 //Mealy machine by its nature would like to fuse some of incoming states, but for now lets keep that for later :)
 
 type VoiDFA struct {
