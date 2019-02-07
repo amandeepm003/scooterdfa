@@ -1,6 +1,9 @@
 package voidfa
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 /*
 To Model Mealy's DFA here
@@ -46,5 +49,34 @@ func buildDFA(inputTransitions []DFATransition) *VoiDFA {
 
 	return &VoiDFA{state: inputTransitions[0].PrevState, triggers: availableTriggers}
 }
+
+
+
+func (dfa *VoiDFA) Trigger(destState State, role Role) *DFAError {
+	dfa.mutex.Lock()
+	defer dfa.mutex.Unlock()
+
+	if role == RoleAdmin { //Super users who can do everything.
+		dfa.state = destState
+		return nil
+	}
+
+	roles, valid := dfa.triggers[dfa.state][destState]
+	if !valid {
+		return &DFAError{Type: "Invalid Transition", Detail: "Role: " + toRoleString(role)+ " CurrState: "+ toStateString(dfa.state) + " DestState: "+ toStateString(destState), Status: 400, TimeStamp: time.Now()}
+	}
+
+	// Check if permissions are valid
+	if !rolePermitted(roles,role) {
+		return &DFAError{Type: "Access Denied", Detail: "Role:  " + toRoleString(role) + " CurrState: "+ toStateString(dfa.state) + " DestState: "+ toStateString(destState), Status: 403, TimeStamp:time.Now()}
+	}
+
+	dfa.state = destState //Reached here after validation, so set DFA to this new state
+	return nil
+}
+
+
+
+
 
 
