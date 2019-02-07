@@ -3,6 +3,8 @@ package voidfa
 import (
 	"sync"
 	"time"
+	"errors"
+	"fmt"
 )
 
 /*
@@ -48,7 +50,7 @@ func BuildDFA(inputTransitions []DFATransition) *VoiDFA {
 
 
 
-func (dfa *VoiDFA) Trigger(destState State, role Role) *DFAError {
+func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 
 	if destState==dfa.state { //State is always reachable by itself, irrespective of role, without counting transition or obtaining lock
 		return nil
@@ -64,12 +66,12 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) *DFAError {
 
 	roles, valid := dfa.triggers[dfa.state][destState]
 	if !valid {
-		return &DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 400, TimeStamp: time.Now()}
+		return errors.New(fmt.Sprintf("%#v",DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 400, TimeStamp: time.Now()}))
 	}
 
 	// Check if permissions are valid
 	if !rolePermitted(roles,role) {
-		return &DFAError{Type: "Access Denied", Detail: "Role:  " + ToRoleString(role) + " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 403, TimeStamp:time.Now()}
+		return errors.New(fmt.Sprintf("%#v",DFAError{Type: "Access Denied", Detail: "Role:  " + ToRoleString(role) + " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 403, TimeStamp:time.Now()}))
 	}
 
 	dfa.state = destState //Reached here after validation, so set DFA to this new state

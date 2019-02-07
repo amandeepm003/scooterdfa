@@ -5,7 +5,7 @@ package voidfa
 type State int
 
 const (
-	StateReady = iota
+	StateReady State = iota
 	StateBatteryLow
 	StateBounty
 	StateRiding
@@ -23,7 +23,7 @@ const (
 type Role int
 const (
 	//External User Roles
-	RoleUser = iota
+	RoleUser Role = iota
 	RoleHunter
 	RoleAdmin
 	//Internal Role
