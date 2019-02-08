@@ -1,14 +1,8 @@
 package main
 
-import (
-	"github.com/amandeepm003/scooterdfa"
-	"fmt"
-	"encoding/json"
-)
-
 func main() {
 
-
+/*
 
 	dfa := voidfa.BuildDFA(voidfa.AvailableTransitions)
 
@@ -30,5 +24,12 @@ func main() {
 		}
 		fmt.Println(dfaError.Status, dfaError.Type)
 	}
-	
+
+*/
+
+	/*
+		Uncomment above block to explore working inside a main function
+		TODO: Below is actual rule interpreter for input commands and responses
+	 */
+
 }
