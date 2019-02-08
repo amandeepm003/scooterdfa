@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 	"errors"
-	"fmt"
+	"encoding/json"
 )
 
 /*
@@ -66,12 +66,18 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 
 	roles, valid := dfa.triggers[dfa.state][destState]
 	if !valid {
-		return errors.New(fmt.Sprintf("%#v",DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 400, TimeStamp: time.Now()}))
+		dfaError := DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState),
+			Status: 400, TimeStamp: time.Now().Format("2006-01-02T15:04:05Z")}
+		dfErrByes,_ :=json.Marshal(dfaError)
+		return errors.New(string(dfErrByes))
 	}
 
 	// Check if permissions are valid
 	if !rolePermitted(roles,role) {
-		return errors.New(fmt.Sprintf("%#v",DFAError{Type: "Access Denied", Detail: "Role:  " + ToRoleString(role) + " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState), Status: 403, TimeStamp:time.Now()}))
+		dfaError := DFAError{Type: "Access Denied", Detail: "Role:  " + ToRoleString(role) + " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState),
+			Status: 403, TimeStamp: time.Now().Format("2006-01-02T15:04:05Z")}
+		dfErrByes,_ :=json.Marshal(dfaError)
+		return errors.New(string(dfErrByes))
 	}
 
 	dfa.state = destState //Reached here after validation, so set DFA to this new state

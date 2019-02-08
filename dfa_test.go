@@ -3,6 +3,7 @@ package voidfa
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
+	"encoding/json"
 )
 
 
@@ -30,7 +31,6 @@ func TestAdminCanTerminate(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, StateTerminated, dfa.state)
 }
-
 
 func TestUserCannotRideBountyVehicle(t *testing.T) {
 	dfa := BuildDFA(AvailableTransitions)
@@ -60,4 +60,57 @@ func TestHunterCanCollectBountyVehicle(t *testing.T) {
 	err:= dfa.Trigger(StateCollected,RoleHunter)
 	assert.Nil(t, err)
 	assert.Equal(t,StateCollected,dfa.state )
+}
+
+
+func TestUserCannotClaimServiceModeVehicle(t *testing.T) {
+	dfa := BuildDFA(AvailableTransitions)
+	dfa.Trigger(StateServiceMode,RoleAdmin)
+	assert.Equal(t, StateServiceMode, dfa.state)
+
+	err:= dfa.Trigger(StateRiding,RoleUser)
+	assert.NotNil(t, err)
+	assert.Equal(t,StateServiceMode,dfa.state )
+	//fmt.Printf("Err %v",err)
+
+	var dfaError DFAError
+	er := json.Unmarshal([]byte(err.Error()), &dfaError)
+	assert.Nil(t,er,nil)
+	assert.Equal(t,"Invalid Transition",dfaError.Type)
+}
+
+
+func TestHunterCannotClaimServiceModeVehicle(t *testing.T) {
+	dfa := BuildDFA(AvailableTransitions)
+	dfa.Trigger(StateServiceMode,RoleAdmin)
+	assert.Equal(t, StateServiceMode, dfa.state)
+
+	err:= dfa.Trigger(StateCollected,RoleHunter)
+	assert.NotNil(t, err)
+	assert.Equal(t,StateServiceMode,dfa.state )
+	//fmt.Printf("Err %v",err)
+
+	var dfaError DFAError
+	er := json.Unmarshal([]byte(err.Error()), &dfaError)
+	assert.Nil(t,er,nil)
+	assert.Equal(t,"Invalid Transition",dfaError.Type)
+	assert.Equal(t,400,dfaError.Status)
+}
+
+
+func TestUserCannotClaimBountyVehicle(t *testing.T) {
+	dfa := BuildDFA(AvailableTransitions)
+	dfa.Trigger(StateBounty,RoleAdmin)
+	assert.Equal(t, StateBounty, dfa.state)
+
+	err:= dfa.Trigger(StateCollected,RoleUser)
+	assert.NotNil(t, err)
+	assert.Equal(t,StateBounty,dfa.state )
+	//fmt.Printf("Err %v",err)
+
+	var dfaError DFAError
+	er := json.Unmarshal([]byte(err.Error()), &dfaError)
+	assert.Nil(t,er,nil)
+	assert.Equal(t,"Access Denied",dfaError.Type)
+	assert.Equal(t,403,dfaError.Status)
 }

@@ -1,13 +1,11 @@
 package voidfa
 
-import "time"
-
 type DFAError struct { //RFC 7807 compliant error struct
 	Type      string    `json:"type"`  //Invalid Transition, Access Denied
-	Title     string    `json:"error"` //Transition Failed
+	Title     string    `json:"title"` //Transition Failed
 	Status    int       `json:"status"` // n.a. here but e.g. 400 - invalid request, 403 - access denied
 	Detail    string    `json:"detail"` // Role, PrevState, CurrState
-	TimeStamp time.Time `json:"timestamp"` //Timestamp at attempt
+	TimeStamp string    `json:"timestamp"` //Timestamp at attempt
 }
 
 
@@ -17,6 +15,7 @@ func rolePermitted (roles []Role, matchRole Role) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
