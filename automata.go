@@ -47,7 +47,7 @@ func BuildDFA(inputTransitions []DFATransition) *VoiDFA {
 		availableTriggers[t.PrevState][t.NewState] = t.Roles
 	}
 
-	return &VoiDFA{state: inputTransitions[0].PrevState, triggers: availableTriggers}
+	return &VoiDFA{state: inputTransitions[0].PrevState, triggers: availableTriggers, lastStateChange: time.Now()}
 }
 
 
@@ -105,7 +105,11 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 	if (dfa.state == StateReady && shouldSleepNow ){
 		dfa.state = StateBounty
 		dfa.lastStateChange = time.Now()
-		return nil
+
+		dfaError := DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState),
+			Status: 400, TimeStamp: time.Now().Format("2006-01-02T15:04:05Z")}
+		dfErrByes,_ :=json.Marshal(dfaError)
+		return errors.New(string(dfErrByes))
 	}
 
 	roles, valid := dfa.triggers[dfa.state][destState]
