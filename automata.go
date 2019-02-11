@@ -5,6 +5,7 @@ import (
 	"time"
 	"errors"
 	"encoding/json"
+	"fmt"
 )
 
 /*
@@ -22,6 +23,8 @@ type VoiDFA struct {
 	triggers map[State]map[State][]Role
 	mutex sync.Mutex //semaphore protecting dfa to act on trigger
 	state   State
+	lastStateChange time.Time //To measure "inactive since 48 hours", will be internally updated on every state change success
+	batteryStatus float64 //Unused now, but actual battery status ( e.g. can be used for validations when Collected->Dropped)
 }
 
 func (dfa *VoiDFA) State() State {
@@ -59,8 +62,39 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 	dfa.mutex.Lock()
 	defer dfa.mutex.Unlock()
 
+
 	if role == RoleAdmin { //Super users who can do everything.
 		dfa.state = destState
+		dfa.lastStateChange = time.Now()
+		return nil
+	}
+
+	//Admin override is kept before "lastStateChange based check & automatic transition"(below).
+	//This is done to ensure that admin action is achieved within one clock cycle, and no extra state transition flow
+
+	sinceLastStateChange := time.Since(dfa.lastStateChange)
+	if (sinceLastStateChange.Hours() >= 48 ) {
+		dfa.state = StateUnknown
+		dfaError := DFAError{Type: "Invalid Transition", Detail: "Role: " + ToRoleString(role)+ " CurrState: "+ ToStateString(dfa.state) + " DestState: "+ ToStateString(destState),
+			Status: 400, TimeStamp: time.Now().Format("2006-01-02T15:04:05Z")}
+		dfErrByes,_ :=json.Marshal(dfaError)
+		return errors.New(string(dfErrByes))
+	}
+
+	loc, _ := time.LoadLocation("Europe/Copenhagen")
+	//NOTE: LIMITATION here for time being, this central time is base for all VOIs across time zones!
+	// Rather trigger request API caller's  IP address location should be loaded here for such validation
+	timeNow := time.Now().In(loc)
+
+	//Voi goes to sleep at 9.30pm
+	startSleepTime := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 21, 30, 0, 0, loc)
+
+	fmt.Printf("DEBUG ** timeNow",timeNow)
+	fmt.Printf("DEBUG ** startSleepTime",startSleepTime)
+	//Will reach here only for non-admin roles, basically admin can even ride in midnight :)
+	if (dfa.state == StateReady && timeNow.After(startSleepTime) ){
+		dfa.state = StateBounty
+		dfa.lastStateChange = time.Now()
 		return nil
 	}
 
@@ -81,6 +115,7 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 	}
 
 	dfa.state = destState //Reached here after validation, so set DFA to this new state
+	dfa.lastStateChange = time.Now()
 	return nil
 }
 
