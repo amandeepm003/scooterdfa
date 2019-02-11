@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"encoding/json"
+	"time"
 )
 
 
@@ -12,10 +13,18 @@ func TestBuildDFA(t *testing.T) {
 	assert.Equal(t, dfa.state, StateReady)
 }
 
-func TestUserCanStartRidingFromReady(t *testing.T) {
+func TestUserCanStartRidingFromReadyWithinAllowedTimes(t *testing.T) {
 	dfa := BuildDFA(AvailableTransitions)
 	err := dfa.Trigger(StateRiding,RoleUser)
-	assert.Nil(t, err)
+
+	timeNow := time.Now()
+	if timeNow.After(time.Date(timeNow.Year(),timeNow.Month(),timeNow.Day(),7,0,0,0, time.UTC)) &&
+		timeNow.Before(time.Date(timeNow.Year(),timeNow.Month(),timeNow.Day(),21,30,0,0, time.UTC)) {
+		assert.Nil(t, err)
+	} else {
+		assert.NotNil(t, err)
+	}
+
 }
 
 func TestUserCannotTerminate(t *testing.T) {

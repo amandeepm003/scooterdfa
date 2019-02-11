@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"encoding/json"
-	"github.com/amandeepm003/scooterdfa/"
+	"github.com/amandeepm003/scooterdfa"
+
 )
 
 func main() {

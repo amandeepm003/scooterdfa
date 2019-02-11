@@ -5,7 +5,6 @@ import (
 	"time"
 	"errors"
 	"encoding/json"
-	"fmt"
 )
 
 /*
@@ -92,15 +91,15 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 	//Assume morning 7am is earliest time Voi can be used
 	earliestStartTime := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 7, 0, 0, 0, loc)
 
-	fmt.Println("DEBUG ** timeNow",timeNow)
-	fmt.Println("DEBUG ** earliestStartTime",earliestStartTime)
-	fmt.Println("DEBUG ** startSleepTime",startSleepTime)
+	//fmt.Println("DEBUG ** timeNow",timeNow)
+	//fmt.Println("DEBUG ** earliestStartTime",earliestStartTime)
+	//fmt.Println("DEBUG ** startSleepTime",startSleepTime)
 
 	shouldSleepNow := false
 	if timeNow.Before(earliestStartTime) || timeNow.After(startSleepTime) {
 		shouldSleepNow = true
 	}
-	fmt.Println("DEBUG ** shouldSleepNow",shouldSleepNow)
+	//fmt.Println("DEBUG ** shouldSleepNow",shouldSleepNow)
 
 	//Will reach here only for non-admin roles, basically admin can even ride in midnight :)
 	if (dfa.state == StateReady && shouldSleepNow ){
