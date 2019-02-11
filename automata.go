@@ -89,10 +89,21 @@ func (dfa *VoiDFA) Trigger(destState State, role Role) error {
 	//Voi goes to sleep at 9.30pm
 	startSleepTime := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 21, 30, 0, 0, loc)
 
-	fmt.Printf("DEBUG ** timeNow",timeNow)
-	fmt.Printf("DEBUG ** startSleepTime",startSleepTime)
+	//Assume morning 7am is earliest time Voi can be used
+	earliestStartTime := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 7, 0, 0, 0, loc)
+
+	fmt.Println("DEBUG ** timeNow",timeNow)
+	fmt.Println("DEBUG ** earliestStartTime",earliestStartTime)
+	fmt.Println("DEBUG ** startSleepTime",startSleepTime)
+
+	shouldSleepNow := false
+	if timeNow.Before(earliestStartTime) || timeNow.After(startSleepTime) {
+		shouldSleepNow = true
+	}
+	fmt.Println("DEBUG ** shouldSleepNow",shouldSleepNow)
+
 	//Will reach here only for non-admin roles, basically admin can even ride in midnight :)
-	if (dfa.state == StateReady && timeNow.After(startSleepTime) ){
+	if (dfa.state == StateReady && shouldSleepNow ){
 		dfa.state = StateBounty
 		dfa.lastStateChange = time.Now()
 		return nil

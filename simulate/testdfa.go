@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/amandeepm003/scooterdfa"
 	"bufio"
 	"os"
 	"fmt"
 	"strings"
 	"encoding/json"
+	"github.com/amandeepm003/scooterdfa/"
 )
 
 func main() {
